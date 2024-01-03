@@ -4,10 +4,8 @@ var userModel = require("./users");
 var passport = require("passport");
 
 const multer = require("multer");
-
 const path = require("path");
 const crypto = require("crypto");
-
 const storage = multer.diskStorage({
   destination : function(req,file,cb){
     cb(null, './public/images/uploads');
@@ -63,7 +61,7 @@ router.get("/profile",isLoggedIn,function(req,res){
 })
 
 
-router.post('/upload', upload.single('image'), function (req, res, next) {
+router.post('/upload', isLoggedIn, upload.single('image'), function (req, res, next) {
   
   userModel.findOne({username:req.session.passport.user})
   .then(function(loggedinuser){
@@ -72,6 +70,13 @@ router.post('/upload', upload.single('image'), function (req, res, next) {
       res.render("profile",{loggedinuser})
     })
   })
+})
+
+router.get("/logout",function(req,res,next){
+  req.logout(function(err) {
+    if (err) { return next(err); }
+    res.redirect('/');
+  });
 })
 
 
